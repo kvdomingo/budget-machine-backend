@@ -1,13 +1,30 @@
-import React from "react";
-import { Grid } from "@geist-ui/react";
+import React, { useState, useEffect } from "react";
+import { MDBRow as Row, MDBCol as Col } from "mdbreact";
 import Calendar from "./Calendar";
+import Today from "./Today";
+import { axiosInstance as axios } from "../axiosInstance";
 
 export default function LoggedInHomeView() {
+  let [calendar, setCalendar] = useState({});
+  let [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    axios
+      .get("calendar")
+      .then(res => setCalendar(res.data))
+      .catch(err => console.error(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
-    <Grid.Container gap={2} justify="center">
-      <Grid xs={18}>
-        <Calendar />
-      </Grid>
-    </Grid.Container>
+    <Row>
+      <Col md={8}>
+        <Today />
+      </Col>
+      <Col md={4}>
+        <Calendar calendar={calendar} loading={loading} />
+      </Col>
+    </Row>
   );
 }

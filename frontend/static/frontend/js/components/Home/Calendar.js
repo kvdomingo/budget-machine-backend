@@ -1,34 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { Row, Col, Loading, Text } from "@geist-ui/react";
-import { axiosInstance as axios } from "../axiosInstance";
+import React from "react";
+import { MDBRow as Row, MDBCol as Col, MDBTypography as Type } from "mdbreact";
 
-export default function Calendar() {
-  let [calendar, setCalendar] = useState({});
-  let [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(true);
-    axios
-      .get("calendar")
-      .then(res => setCalendar(res.data))
-      .catch(err => console.error(err.message))
-      .finally(() => setLoading(false));
-  }, []);
-
+export default function Calendar({ loading, calendar }) {
   return loading ? (
-    <Loading size="large" />
+    <div className="spinner-grow spinner-grow-lg" />
   ) : (
     <>
-      <Text h1>
+      <Type tag="h1" variant="h2">
         {calendar.monthNames[calendar.monthIndex]} {calendar.year}
-      </Text>
+      </Type>
       <Row>
         {calendar.dayNames.map(day => (
-          <Col>{day}</Col>
+          <Col>{day.slice(0, 3)}</Col>
         ))}
       </Row>
       {calendar.month.map(week => (
-        <Row>
+        <Row className="my-2">
           {week.map(day => (
             <Col>{day === 0 ? null : day}</Col>
           ))}

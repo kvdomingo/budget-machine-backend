@@ -1,3 +1,11 @@
+body {
+  font-family: 'Inter', sans-serif !important;
+}
+
+.kill-shadow {
+  box-shadow: none !important;
+}
+
 @media (max-width: 576px) {
   html {
     font-size: 0.95rem;

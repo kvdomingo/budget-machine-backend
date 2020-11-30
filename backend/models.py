@@ -25,16 +25,18 @@ class IncomeExpense(models.Model):
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
+        blank=True,
         null=True,
+        default=None,
         to_field='name',
         related_name='expenses',
     )
     date = models.DateField()
 
     class Meta:
-        ordering = ['-date']
+        ordering = ['-type', '-date']
         verbose_name = 'income/expense'
         verbose_name_plural = 'incomes/expenses'
 
     def __str__(self):
-        return f'{self.description} ({self.amount})'
+        return f'[{dict(self.INCOME_EXPENSE_CHOICES)[self.type].upper()}] {self.description} ({self.amount:.2f})'

@@ -1,11 +1,12 @@
 import calendar
 from datetime import datetime
-from rest_framework import permissions
+from .serializers import *
+from rest_framework import permissions, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 
-class CalendarInfo(APIView):
+class CalendarApi(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
@@ -18,3 +19,14 @@ class CalendarInfo(APIView):
             'year': now.year,
         }
         return Response(response)
+
+
+class CategoryApi(generics.ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class IncomeExpenseApi(generics.ListAPIView):
+    queryset = IncomeExpense.objects.all()
+    serializer_class = IncomeExpenseSerializer
+    filterset_fields = ['type', 'date', 'category']

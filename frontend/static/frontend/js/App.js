@@ -1,12 +1,9 @@
 import React from "react";
-import { GeistProvider, CssBaseline } from "@geist-ui/react";
+import { MDBContainer as Container } from "mdbreact";
 import LoggedInHomeView from "./components/Home/LoggedInHomeView";
 
 export default function App() {
-  return (
-    <GeistProvider>
-      <CssBaseline />
-      <LoggedInHomeView />
-    </GeistProvider>
-  );
+  const token = localStorage.getItem("bm-token") || "bm-token";
+
+  return <Container className="py-5">{token ? <LoggedInHomeView /> : null}</Container>;
 }
