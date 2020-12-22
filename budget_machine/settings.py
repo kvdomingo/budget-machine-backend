@@ -31,17 +31,22 @@ DEBUG = os.environ.get('DEBUG')
 
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 
-ALLOWED_HOSTS = ['localhost', '.herokuapp.com']
+ALLOWED_HOSTS = ['.herokuapp.com']
+
+if DEBUG:
+	ALLOWED_HOSTS.extend([
+		'localhost',
+		'127.0.0.1',
+	])
 
 
 # Application definition
 
 INSTALLED_APPS = [
     'backend.apps.BackendConfig',
-    'frontend.apps.FrontendConfig',
-    'webpack_loader',
     'django_filters',
     'rest_framework',
+	'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,6 +56,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+	'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -61,6 +67,18 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'budget_machine.urls'
+
+CORS_ORIGIN_ALLOW_ALL = False
+
+CORS_ORIGIN_WHITELIST = [
+    'https://budget-machine.vercel.app',
+]
+
+if DEBUG:
+    CORS_ORIGIN_WHITELIST.extend([
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+    ])
 
 TEMPLATES = [
     {
@@ -136,15 +154,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
-
-
-WEBPACK_LOADER = {
-    'DEFAULT': {
-        'CACHE': False,
-        'BUNDLE_DIR_NAME': 'frontend/bundles/',
-        'STATS_FILE': BASE_DIR / 'webpack-stats.json',
-    },
-}
 
 STATIC_URL = '/static/'
 
