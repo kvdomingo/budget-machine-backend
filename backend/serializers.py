@@ -7,6 +7,11 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = '__all__'
 
+    def create(self, validated_data):
+        instance = self.Meta.model(**validated_data)
+        instance.save()
+        return instance
+
 
 class IncomeExpenseSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
