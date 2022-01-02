@@ -1,9 +1,11 @@
 asgiref
 dj-database-url
+black
 Django<4.0
 django-cors-headers
 django-filter
 djangorestframework
+djangorestframework-camel-case
 djangorestframework-jwt
 django-revproxy
 gunicorn

@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  apiserver:
+    build:
+      context: .
+      target: dev
+    image: kvdomingo/budget-machine-api:latest
+    env_file: .env
+    ports:
+      - ${PORT}:${PORT}
+    volumes:
+      - .:/budget
+
+  frontend:
+    build:
+      context: .
+      target: web
+    image: kvdomingo/budget-machine-app:latest
+    env_file: ./web/app/.env
+    volumes:
+      - .:/budget

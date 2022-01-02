@@ -11,8 +11,12 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 import os
+import urllib
+import dj_database_url
+from django.core.management.utils import get_random_secret_key
 from dotenv import load_dotenv
 from pathlib import Path
+from psycopg2cffi import compat
 
 load_dotenv()
 
@@ -23,122 +27,152 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get("SECRET_KEY", default=get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG')
+DEBUG = os.environ.get("DEBUG", False)
 
-DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
+PYTHON_ENV = os.environ.get("PYTHON_ENV", "production")
 
-ALLOWED_HOSTS = ['.herokuapp.com']
+ALLOWED_HOSTS = [".herokuapp.com"]
 
 if DEBUG:
-    ALLOWED_HOSTS.extend([
-        'localhost',
-        '127.0.0.1',
-    ])
+    ALLOWED_HOSTS.extend(
+        [
+            "localhost",
+            "127.0.0.1",
+            "0.0.0.0",
+        ]
+    )
 
 # Application definition
 
 INSTALLED_APPS = [
-    'backend.apps.BackendConfig',
-    'django_filters',
-    'rest_framework',
-    'corsheaders',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "backend.apps.BackendConfig",
+    "django_filters",
+    "rest_framework",
+    "corsheaders",
+    "revproxy",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'budget_machine.urls'
+ROOT_URLCONF = "budget_machine.urls"
 
 CORS_ORIGIN_ALLOW_ALL = False
 
-CORS_ORIGIN_WHITELIST = [
-    'https://budget-machine.vercel.app',
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https:\/\/budget-machine\.vercel\.app",
+    r"^https:\/\/.+\.kvdstudio\.app",
 ]
 
 if DEBUG:
-    CORS_ORIGIN_WHITELIST.extend([
-        'http://localhost:3000',
-        'http://127.0.0.1:3000',
-    ])
+    CORS_ALLOWED_ORIGIN_REGEXES.extend(
+        [
+            r"^http:\/\/localhost:\d{4,}",
+            r"^http:\/\/127\.0\.0\.1:\d{4,}",
+            r"^http:\/\/0\.0\.0\.0:\d{4,}",
+        ]
+    )
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "web" / "app"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'budget_machine.wsgi.application'
+WSGI_APPLICATION = "budget_machine.wsgi.application"
+
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
+
+compat.register()
+
+if PYTHON_ENV == "development":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+else:
+    DATABASE_URL = os.environ.get("DATABASE_URL")
+    DATABASE_CONFIG = dj_database_url.parse(DATABASE_URL)
+    DATABASE_CONFIG["HOST"] = urllib.parse.unquote(DATABASE_CONFIG["HOST"])
+    DATABASES = {"default": DATABASE_CONFIG}
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # REST API
 
 REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend',
+    "DEFAULT_RENDERER_CLASSES": [
+        "djangorestframework_camel_case.render.CamelCaseJSONRenderer",
+        "djangorestframework_camel_case.render.CamelCaseBrowsableAPIRenderer",
+    ],
+    "DEFAULT_PARSER_CLASSES": [
+        "djangorestframework_camel_case.parser.CamelCaseFormParser",
+        "djangorestframework_camel_case.parser.CamelCaseMultiPartParser",
+        "djangorestframework_camel_case.parser.CamelCaseJSONParser",
+    ],
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
     ],
 }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'Asia/Manila'
+TIME_ZONE = "Asia/Manila"
 
 USE_I18N = True
 
@@ -149,11 +183,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 
-PYTHON_ENV = os.environ.get('PYTHON_ENV')
+STATIC_ROOT = BASE_DIR / "static"
 
-if PYTHON_ENV == 'production':
-    import django_heroku
+STATICFILES_DIRS = [BASE_DIR / "web" / "app" / "static"]
 
-    django_heroku.settings(locals())
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
