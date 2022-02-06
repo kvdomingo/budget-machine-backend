@@ -15,11 +15,17 @@ export default function LoggedInHomeView() {
   };
 
   useEffect(() => {
-    api.data.calendar().then(res => setCalendar({ data: res.data, loading: false }));
+    api.data
+      .getCalendar()
+      .then(res => setCalendar({ data: res.data, loading: false }))
+      .catch(err => console.error(err.message));
   }, []);
 
   useEffect(() => {
-    api.data.incomeExpense().then(res => setIncomeExpense({ data: res.data, loading: false }));
+    api.data
+      .getIncomesExpenses()
+      .then(res => setIncomeExpense({ data: res.data, loading: false }))
+      .catch(err => console.error(err.message));
   }, []);
 
   return (

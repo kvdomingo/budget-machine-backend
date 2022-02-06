@@ -1,0 +1,23 @@
+version: '3'
+
+tasks:
+  default:
+    desc: Start Docker containers and attach to logs stream
+    cmds:
+      - docker compose up -d --build --remove-orphans
+      - docker compose logs --follow
+
+  logs:
+    desc: Show logs stream
+    cmds:
+      - docker compose logs --follow
+
+  shutdown:
+    desc: Stop all containers
+    cmds:
+      - docker compose stop
+
+  clean:
+    desc: Remove all containers
+    cmds:
+      - docker compose down -v --remove-orphans

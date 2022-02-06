@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import {
   MDBTypography as Type,
   MDBListGroup as ListGroup,
@@ -7,10 +7,12 @@ import {
   MDBRow as Row,
   MDBIcon as Icon,
 } from "mdbreact";
+import CreateCategoryModal from "./CreateCategoryModal";
 import dateFormat from "dateformat";
 import PropTypes from "prop-types";
 
 function Today({ incomeExpense, selectedDay }) {
+  const [showCreateCategory, setShowCreateCategory] = useState(false);
   const todayHeader = dateFormat(new Date(), "dddd, d mmmm yyyy");
   const todayDate = `${dateFormat(new Date(), "yyyy-mm")}-${selectedDay.toString().padStart(2, "0")}`;
 
@@ -21,7 +23,10 @@ function Today({ incomeExpense, selectedDay }) {
       <Type tag="h1" variant="h2" className="mb-4">
         {todayHeader}
       </Type>
-      <div className="btn btn-outline-black btn-sm mb-4">Create category</div>
+      <div className="btn btn-outline-black btn-sm mb-4" onClick={() => setShowCreateCategory(true)}>
+        Create category
+      </div>
+      <CreateCategoryModal open={showCreateCategory} setOpen={setShowCreateCategory} />
       <ListGroup>
         {incomeExpense.data
           .filter(obj => obj.type === "Expense")
@@ -36,7 +41,7 @@ function Today({ incomeExpense, selectedDay }) {
                 </Col>
                 <Col md={6}>{obj.description}</Col>
                 <Col md={2} className="text-left text-md-right">
-                  <code>₱ {obj.amount.toFixed(2)}</code>
+                  <code>₱ {obj.amount}</code>
                 </Col>
                 <Col md={2} className="text-right">
                   <div className="btn p-1 kill-shadow m-0">

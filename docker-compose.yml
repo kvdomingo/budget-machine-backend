@@ -7,16 +7,28 @@ services:
       target: dev
     image: kvdomingo/budget-machine-api:latest
     env_file: .env
-    ports:
-      - ${PORT}:${PORT}
     volumes:
-      - .:/budget
+      - .:/backend
 
   frontend:
     build:
-      context: .
-      target: web
+      context: ./web/app
+      target: dev
     image: kvdomingo/budget-machine-app:latest
     env_file: ./web/app/.env
     volumes:
-      - .:/budget
+      - ./web/app:/web
+
+  proxy:
+    image: nginx:latest
+    ports:
+      - 8000:8000
+    command:
+      - nginx
+      - "-g"
+      - daemon off;
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - apiserver
+    restart: unless-stopped

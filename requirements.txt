@@ -1,15 +1,12 @@
 asgiref
 dj-database-url
-black
-Django<4.0
+Django
 django-cors-headers
 django-filter
 djangorestframework
 djangorestframework-camel-case
 djangorestframework-jwt
-django-revproxy
 gunicorn
-psycopg2cffi
 PyJWT
 python-dotenv
 pytz

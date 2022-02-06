@@ -1,22 +1,29 @@
 import axios from "axios";
+import { Cookies } from "react-cookie";
 
-const { NODE_ENV } = process.env;
+const cookies = new Cookies();
 
-const baseURL =
-  NODE_ENV === "development" ? "http://localhost:8000/api/" : "https://budget-machine-api.herokuapp.com/api/";
+const baseURL = "/api/";
 
 const axiosInstance = axios.create({ baseURL });
 
 const api = {
   data: {
-    incomeExpense() {
+    getIncomesExpenses() {
       return axiosInstance.get("income-expense");
     },
-    calendar() {
+    getCalendar() {
       return axiosInstance.get("calendar");
     },
-    category() {
+    getCategories() {
       return axiosInstance.get("category");
+    },
+    createCategory(data) {
+      return axiosInstance.post("category", data, {
+        headers: {
+          "X-CSRFToken": cookies.get("csrftoken"),
+        },
+      });
     },
   },
 };

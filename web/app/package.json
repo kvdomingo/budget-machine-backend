@@ -1,5 +1,7 @@
 {
-  "name": "frontend",
+  "name": "budget-machine",
+  "author": "Kenneth V. Domingo <hello@kvdomingo.xyz>",
+  "license": "MIT",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -9,14 +11,18 @@
     "axios": "^0.21.1",
     "dateformat": "^4.4.0",
     "html-react-parser": "^1.0.0",
-    "mdbreact": "^5.0.1",
-    "prop-types": "^15.7.2",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
+    "mdbreact": "^5.2.0",
+    "react": "^17.0.2",
+    "react-color": "^2.19.3",
+    "react-cookie": "^4.1.1",
+    "react-dom": "^17.0.2",
     "react-helmet": "^6.1.0",
-    "react-router-dom": "^5.2.0",
-    "react-scripts": "4.0.1",
+    "react-router-dom": "^5.3.0",
+    "react-scripts": "^4.0.3",
     "web-vitals": "^0.2.4"
+  },
+  "resolutions": {
+    "react-error-overlay": "6.0.9"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -43,7 +49,8 @@
     ]
   },
   "devDependencies": {
-    "prettier": "^2.2.1"
+    "prettier": "^2.5.1",
+    "prop-types": "^15.7.2"
   },
   "prettier": {
     "arrowParens": "avoid",

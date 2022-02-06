@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import dateFormat from "dateformat";
 
 function Calendar({ calendar, selectedDay, handleChangeSelectedDay, incomeExpense }) {
-  return calendar.loading && incomeExpense.loading ? (
+  return calendar.loading || incomeExpense.loading ? (
     <div className="spinner-grow spinner-grow-lg" />
   ) : (
     <>
